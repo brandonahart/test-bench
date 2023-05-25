@@ -1,0 +1,10 @@
+
+.DS_Store
+.swp
+.swo
+.RData
+.Rhistory
+.Rproj.user
+
+data/
+tmp/
