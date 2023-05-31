@@ -1,13 +1,16 @@
 #!/usr/bin/env zsh
 
-
 # using "heredoc" in bash/zsh
 
-sqlite3 -csv "./data/test.db" <<EOS
+DB="./data/test.db"
+INF="./data/tiny.csv"
+
+
+sqlite3 -csv $DB <<EOS
 
 drop table if exists t;
 
-.import ./data/tiny.csv t
+.import ${INF} t
 
 .header on
 .mode col
