@@ -3,11 +3,11 @@
 
 # using "heredoc" in bash/zsh
 
-sqlite3 -csv "test.db" <<EOS
+sqlite3 -csv "./data/test.db" <<EOS
 
 drop table if exists t;
 
-.import test.csv t
+.import ./data/tiny.csv t
 
 .header on
 .mode col
