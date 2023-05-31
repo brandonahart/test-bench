@@ -3,7 +3,7 @@
 # using "heredoc" in bash/zsh
 
 DB="./data/test.db"
-INF="./data/tiny.csv"
+INF="./data/csv/tiny.csv"
 
 
 sqlite3 -csv $DB <<EOS
