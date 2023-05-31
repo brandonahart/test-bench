@@ -1,0 +1,23 @@
+#!/usr/bin/env zsh
+
+
+# using "heredoc" in bash/zsh
+
+sqlite3 -csv "test.db" <<EOS
+
+drop table if exists t;
+
+.import test.csv t
+
+.header on
+.mode col
+
+select * from t; 
+
+create index t_col1 on t(col1);
+
+.sch t
+
+EOS
+
+
