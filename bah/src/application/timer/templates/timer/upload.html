@@ -1,0 +1,12 @@
+<body>
+<form method="POST" class="post-form" enctype="multipart/form-data">  
+    {% csrf_token %}    
+    {{ form.as_p }}
+    <button type="submit" class="save btn btn-default">Upload</button>
+</form>
+{% if ex_time %}
+    <p>The file was uploaded to {{location}} in {{ex_time}} seconds and used a total amount of memory in {{ memory }}</p>
+{% else %}
+    <p>No file has been submitted yet</p>
+{% endif %}
+</body>
