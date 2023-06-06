@@ -1,8 +1,9 @@
+import time
 import boto3
 from botocore.exceptions import NoCredentialsError
 
-ACCESS_KEY = 'AKIAUWKA3JWNWF7HVK6Y'
-SECRET_KEY = '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'
+ACCESS_KEY = ''
+SECRET_KEY = ''
 
 
 def upload_to_aws(local_file, bucket, s3_file):
@@ -19,5 +20,8 @@ def upload_to_aws(local_file, bucket, s3_file):
         print("Credentials not available")
         return False
 
-
-uploaded = upload_to_aws('../../data/data.csv', 'bahbucket', 'data.csv')
+start = time.time()
+uploaded = upload_to_aws('../../data/data.csv', 'bahbucket', 'tinydata.csv')
+end = time.time()
+ex = end - start
+print(f"Execution time was {ex} seconds")
