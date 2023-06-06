@@ -3,11 +3,12 @@ import time
 import sqlite3
 import os
 import psutil
+import boto3
+from datetime import datetime, timezone
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.conf import settings
 from .models import Upload
-from .forms import UploadFileForm
 from .forms import UploadForm
 from pymongo import MongoClient
 
@@ -17,6 +18,7 @@ from pymongo import MongoClient
 def index(request):
     return HttpResponse("Hello, world. You're at the timer index.")
 
+# Timer home page for timer app
 def sleeping(request, name, count):
     time.sleep(count)
     return HttpResponse("Thank you for waiting, " + name + "\n")
@@ -27,22 +29,55 @@ def upload_file(request):
     if request.method == "POST":
         form = UploadForm(request.POST, request.FILES)
         if form.is_valid():
+            file = request.FILES["file"]
+            file_obj_type = str(type(file))
             if request.POST.get('choice') == 'DIRECTORY':
                 print("Test for upload to directory")
-                ex_time, result = handle_file_to_directory(request.FILES["file"])
-                context = { "form": form, "ex_time": ex_time, "location": "file system", "memory": result }
+                print(os.getenv('PUBLIC_KEY_ACCESS'))
+                #Execute upload file
+                header, start_time, ex_time, created_date, memory = handle_file_to_directory(file)
+
+                #Use function to insert stats
+                insert_stats(file, "fs", header, created_date, start_time, ex_time, memory[2], file_obj_type)
+
+                #return form
+                context = { "form": form, "ex_time": ex_time, "location": "file system", "memory": memory }
                 return render(request, "timer/upload.html", context)
 
             elif request.POST.get('choice') == 'SQLITE':
                 print("Test for upload to SQLite")
-                ex_time, result = handle_file_to_sql(request.FILES["file"])
-                context = { "form": form, "ex_time": ex_time, "location": "SQLite database", "memory": result }
+                #Execute upload file
+                header, start_time, ex_time, created_date, memory = handle_file_to_sql(file)
+
+                #Use function to insert stats
+                insert_stats(file, "sql", header, created_date, start_time, ex_time, memory[2], file_obj_type)
+
+                #return form
+                context = { "form": form, "ex_time": ex_time, "location": "SQLite database", "memory": memory }
                 return render(request, "timer/upload.html", context)
 
             elif request.POST.get('choice') == 'MONGO':
                 print("Test for uplaod to MongoDB")
-                ex_time, result = handle_file_to_mongo(request.FILES["file"])
-                context = { "form": form, "ex_time": ex_time, "location": "MongoDB", "memory": result }
+                #Execute upload file
+                header, start_time, ex_time, created_date, memory = handle_file_to_mongo(file)
+                
+                #Use function to insert stats
+                insert_stats(file, "mongo", header, created_date, start_time, ex_time, memory[2], file_obj_type)
+
+                #return form
+                context = { "form": form, "ex_time": ex_time, "location": "MongoDB", "memory": memory }
+                return render(request, "timer/upload.html", context)
+
+            elif request.POST.get('choice') == 'S3':
+                print("Test for upload to S3")
+                #Execute upload file
+                header, start_time, ex_time, created_date, memory = handle_file_to_s3(file)
+
+                #Use function to insert stats
+                insert_stats(file, "s3", header, created_date, start_time, ex_time, memory[2], file_obj_type)
+
+                #return form
+                context = { "form": form, "ex_time": ex_time, "location": "S3", "memory": memory }
                 return render(request, "timer/upload.html", context)
 
             else:
@@ -64,25 +99,51 @@ def profiler(func):
     def wrapper(*args, **kwargs):
         start_time = time.time()
         mem_before = process_memory()
-        result = func(*args, **kwargs)
+
+        header = func(*args, **kwargs)
+        print(f"Header is: {header}")        
+
         end_time = time.time()
         ex_time = end_time - start_time
+        created_date = datetime.now(timezone.utc)
         mem_after = process_memory()
         mem_output = (mem_before, mem_after, mem_after - mem_before)
         print("{}:consumed memory: {:}".format(
             func.__name__,
             mem_output))
         print(f"Time took to upload was {ex_time} seconds\n") 
-        return (ex_time, mem_output)
+
+        return (header, start_time, ex_time, created_date, mem_output)
     return wrapper
 
+
+#Helper function to insert stats
+def insert_stats(file, load_type, header, created_date, start_time, elapsed_time, memory_consumed, file_obj_type):
+    connection = sqlite3.connect('../../data/stats.db')
+    cursor = connection.cursor()
+
+    cursor.execute("""CREATE TABLE IF NOT EXISTS upload_stats (file_name TEXT, file_type TEXT, load_type TEXT, 
+                     file_size INTEGER, header TEXT, created_date TEXT, start_time INTEGER, elapsed_time INTEGER, memory_consumed INTEGER, file_obj_type TEXT)""")
+
+    insert_query = """INSERT INTO upload_stats 
+                      (file_name, file_type, load_type, file_size, header, created_date, start_time, elapsed_time, memory_consumed, file_obj_type)
+                      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"""
+    data_tuple = (file.name, file.content_type, load_type, file.size, header, created_date, start_time, elapsed_time, memory_consumed, file_obj_type)
+    cursor.execute(insert_query, data_tuple)
+    
+    print("File stats inserted")
+    connection.commit()
+    cursor.close()
 
 # Helper view function to handle regular file upload to specific loaction
 @profiler
 def handle_file_to_directory(f):
+    header = f.readline().decode('utf-8').strip('\n')
+    f.seek(0)
     with open("../../data/uploads-django/" + f.name, "wb+") as destination:
         for chunk in f.chunks():
             destination.write(chunk)
+    return header
 
 
 #Helper function to stream file into mongodb
@@ -92,6 +153,9 @@ def handle_file_to_mongo(f):
     db = client[settings.MONGODB_DATABASE]
     collection = db[settings.MONGODB_COLLECTION]
 
+    header = f.readline().decode('utf-8').stript('\n')
+    f.seek(0)    
+    
     # Read and insert CSV data into MongoDB
     csv_reader = csv.DictReader(f.read().decode('utf-8').splitlines())
     documents = []
@@ -105,6 +169,7 @@ def handle_file_to_mongo(f):
     if documents:
         collection.insert_many(documents)
     client.close()
+    return header
 
 
 #Helper function to stream file into sqlite
@@ -112,6 +177,9 @@ def handle_file_to_mongo(f):
 def handle_file_to_sql(f):
     connection = sqlite3.connect('../../data/SportsDB.db')
     cursor = connection.cursor()
+
+    header = f.readline().decode('utf-8').strip('\n')
+    f.seek(0)    
 
     csv_data = f.read().decode('utf-8').splitlines()
     reader = csv.reader(csv_data)
@@ -132,4 +200,21 @@ def handle_file_to_sql(f):
 
     connection.commit()
     connection.close()
+    return header
+
+
+@profiler
+def handle_file_to_s3(f):
+    print(type(f))
+
+    header = f.readline().decode('utf-8').strip('\n')
+    f.seek(0)
+
+    s3 = boto3.client('s3', aws_access_key_id=settings.PUBLIC_KEY, aws_secret_access_key=settings.PRIVATE_KEY)
+    file_name = "s3_test_{}".format(datetime.now(timezone.utc))   
+
+    s3.put_object(Body=f, Bucket="bahbucket", Key=file_name)
+    
+    return header
+
 

@@ -4,6 +4,7 @@ UPLOAD_CHOICES = (
     ('DIRECTORY', 'Upload to Current Directory'),
     ('SQLITE', 'Upload to SQLite'),
     ('MONGO', 'Upload to MongoDB'),
+    ('S3', 'Upload to Amazon S3'),
 )
 
 class Upload(models.Model):

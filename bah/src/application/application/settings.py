@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -127,3 +128,7 @@ MONGODB_HOST = 'localhost'
 MONGODB_PORT = 27017
 MONGODB_DATABASE = 'DjangoMongoDB'
 MONGODB_COLLECTION = 'collection1'
+
+# S3 keys
+PUBLIC_KEY = os.getenv('PUBLIC_KEY_ACCESS')
+PRIVATE_KEY = os.getenv('PRIVATE_KEY_ACCESS')
