@@ -5,15 +5,15 @@ from multiprocessing import Pool
 
 # MongoDB connection settings
 mongodb_url = 'mongodb://localhost:27017'
-database_name = 'your_database1'
+database_name = 'TestDB'
 collection_name = 'collection1'
 
 # CSV file settings
-csv_file = '../../data/data.csv'
+csv_file = '../../../../../pythonTestPractice/student_data.csv'
 delimiter = ','  # Change if your CSV file uses a different delimiter
 
 # Number of worker processes
-num_workers = 8  # Set the number of worker processes to utilize
+num_workers = 10  # Set the number of worker processes to utilize
 
 # Connect to MongoDB
 
@@ -28,7 +28,7 @@ def process_chunk(chunk):
         batch.append(row)
 
         # Check if batch is full and insert into MongoDB
-        if len(batch) == 100000:
+        if len(batch) == 500000:
             insert_batch(batch)
             batch = []
 

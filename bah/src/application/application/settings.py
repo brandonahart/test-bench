@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'timer.apps.TimerConfig'
+    'timer.apps.TimerConfig',
+
 ]
 
 MIDDLEWARE = [
@@ -130,5 +131,10 @@ MONGODB_DATABASE = 'DjangoMongoDB'
 MONGODB_COLLECTION = 'collection1'
 
 # S3 keys
+#STORAGES = {"default": {"BACKEND": "storages.backends.s3boto3.S3Boto3Storage"}}
 PUBLIC_KEY = os.getenv('PUBLIC_KEY_ACCESS')
 PRIVATE_KEY = os.getenv('PRIVATE_KEY_ACCESS')
+AWS_STORAGE_BUCKET_NAME = 'bahbucket'
+AWS_S3_REGION_NAME = 'us-east-2'
+
+#FILE_UPLOAD_TEMP_DIR = "/datadrive"

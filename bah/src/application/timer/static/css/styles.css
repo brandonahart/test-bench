@@ -1,0 +1,51 @@
+/* styles.css */
+
+/* Set font styles */
+body {
+  font-family: Arial, sans-serif;
+}
+
+/* Style the table */
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+table th,
+table td {
+  font-size: 15px;
+  padding: 8px;
+  text-align: center;
+}
+
+table th {
+  background-color: #f2f2f2;
+}
+
+/* Add alternating row colors */
+table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* Style the table header */
+table th {
+  font-weight: bold;
+  color: #333;
+}
+
+/* Add hover effect to table rows */
+table tr:hover {
+  background-color: #ebebeb;
+}
+
+/* Style the file name column */
+.file-name-column {
+  width: 40%;
+}
+
+/* Style the other columns as needed */
+/* .column-name {
+  width: ...;
+}
+...
+*/
