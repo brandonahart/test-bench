@@ -4,6 +4,8 @@ from django.contrib import messages
 
 from .forms import CreateUserForm
 
+from .decorators import unauthenticated_user
+
 
 # Home page index view function
 def index(request):
@@ -11,6 +13,7 @@ def index(request):
     return render(request, 'index.html', context)
 
 #register page
+@unauthenticated_user
 def registerPage(request):
     form = CreateUserForm()
     if request.method == 'POST':
@@ -28,6 +31,7 @@ def registerPage(request):
     context = {'form': form}
     return render(request, 'register.html', context)
 
+@unauthenticated_user
 def loginPage(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -36,7 +40,7 @@ def loginPage(request):
 
         if user is not None:
             login(request, user)
-            return redirect('upload_file')
+            return redirect('/timer/upload/')
         else:
             messages.info(request, 'Username or password is incorrect')        
     

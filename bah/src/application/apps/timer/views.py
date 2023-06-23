@@ -1,7 +1,6 @@
 import csv
 import time
 import sqlite3
-import os
 import psutil
 import boto3
 from datetime import datetime, timezone
@@ -12,19 +11,20 @@ from .models import Upload
 from .forms import UploadFileForm
 from pymongo import MongoClient
 
+from django.contrib.auth.decorators import login_required
+
 
 
 # Home page index view function
+@login_required(login_url='login')
 def index(request):
-    return HttpResponse("Hello, world. You're at the timer index.")
+    context = {}
+    return render(request, 'timer_index.html', context)
+    #return HttpResponse("Hello, world. You're at the timer index. Add links including 'Upload One File' 'Upload Multiple Files' 'Check Uploaded Files Stats'")
 
-# Timer home page for timer app
-def sleeping(request, name, count):
-    time.sleep(count)
-    return HttpResponse("Thank you for waiting, " + name + "\n")
-    
 
 # View function to upload a file
+@login_required(login_url='login')
 def upload_file(request):
     if request.method == "POST":
         form = UploadFileForm(request.POST, request.FILES)
@@ -71,6 +71,7 @@ def upload_file(request):
 
 
 # View function to display file stats table
+@login_required(login_url='login')
 def file_list(request):
     files = Upload.objects.all()
     return render(request, 'file_list.html', {'files': files})
@@ -124,13 +125,14 @@ def handle_file_to_sql(f):
     column_names = next(reader)
     columns = ", ".join(column_names)
 
-    table_name = 'sports_data'
-    cursor.execute("drop table if exists sports_data")
-    create_table_query = f"CREATE TABLE IF NOT EXISTS {table_name} ({columns})"
+    table_name = '' + f.name + 'x'
+    drop_table_query = "DROP TABLE IF EXISTS sports"
+    cursor.execute(drop_table_query)
+    create_table_query = 'CREATE TABLE sports ({})'.format(columns)
     cursor.execute(create_table_query)
 
     placeholders = ", ".join('?' for _ in column_names)
-    insert_query = f"INSERT INTO {table_name} VALUES ({placeholders})"
+    insert_query = 'INSERT INTO sports VALUES ({})'.format(placeholders)
     
     data = [tuple(row) for row in reader]
     
