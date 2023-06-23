@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<a href="{% url 'sleep:sleeping_time' %}">Start a new sleeper</a>
+
+<hr>
+<h4>Refresh the page to update content</h4>
+<ul>
+    {% for sleeper in sleepers %}
+    <li>Put to sleep at {{ sleeper.created_at }}
+        <ul>
+            <li>Status: {{ sleeper.status }}</li>
+            <li>Input: {{ sleeper.input }}</li>
+            <li>Output:
+                {% if sleeper.time_asleep %}
+                    Been asleep for {{ sleeper.time_asleep }} seconds
+                {% else %}
+                    Just fell asleep...
+                {% endif %}
+            </li>
+        </ul>
+    </li>
+    {% endfor %}
+
+{% endblock %}

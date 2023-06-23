@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<a href="{% url 'sleep:sleeping_list' %}">See Sleeping Tasks</a>
+
+<hr>
+
+<form method="post">
+    {% csrf_token %}
+    <label for="sleep_number">
+    <input type="number" name="sleep_number" id="sleep_number">
+    <input type="submit" value="Submit">
+    <input type="reset">
+</form>
+{% endblock %}

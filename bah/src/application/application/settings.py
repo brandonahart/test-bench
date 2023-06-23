@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'apps.timer.apps.TimerConfig',
-    'apps.homepage.apps.HomepageConfig'
+    'apps.homepage.apps.HomepageConfig',
+    'apps.sleep.apps.SleepConfig'
 ]
 
 MIDDLEWARE = [
@@ -123,7 +124,9 @@ STATICFILES_DIRS = [
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-
+# Celery settings
+CELERY_BROKER_URL = "redis://localhost:6379"
+CELERY_RESULT_BACKEND = "redis://localhost:6379"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -141,5 +144,3 @@ PUBLIC_KEY = os.getenv('PUBLIC_KEY_ACCESS')
 PRIVATE_KEY = os.getenv('PRIVATE_KEY_ACCESS')
 AWS_STORAGE_BUCKET_NAME = 'bahbucket'
 AWS_S3_REGION_NAME = 'us-east-2'
-
-#FILE_UPLOAD_TEMP_DIR = "/datadrive"
