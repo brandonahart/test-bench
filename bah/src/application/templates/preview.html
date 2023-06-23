@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}
+<h3>Preview Page</h3>
+{% endblock%}
+
+{% block content %}
+  <table>
+    <thead>
+    {% for column in columns %}
+        <td>{{ column }}</td>
+    {% endfor %}
+    </thead>
+    <tbody>
+      {% for row in page %}
+        <tr>
+          {% for value in row %}
+            <td>{{ value }}</td>
+          {% endfor %}
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="{{ columns|length }}">No data available</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- Pagination links -->
+  <div class="pagination">
+    <span class="step-links">
+    {% if page.has_previous %}
+      <a href="?page={{ page.previous_page_number }}">Previous</a>
+    {% endif %}
+
+    <span class="current-page">{{ page.number }}</span>
+
+    {% if page.has_next %}
+      <a href="?page={{ page.next_page_number }}">Next</a>
+    {% endif %}
+    </span>
+  </div>
+{% endblock %}
