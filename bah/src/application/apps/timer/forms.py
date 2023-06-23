@@ -13,3 +13,6 @@ def validate_file_extension(value):
 class UploadFileForm(forms.Form):
     file = forms.FileField(validators=[validate_file_extension])
     location = forms.ChoiceField(choices=(('DIRECTORY', 'Upload to Current Directory'), ('SQLITE', 'Upload to SQLite'), ('MONGO', 'Upload to MongoDB'), ('S3', 'Upload to Amazon S3')))
+
+class UploadMultiFileForm(forms.Form):
+    files = forms.FileField(widget=forms.ClearableFileInput(attrs={'allow_multiple_selected': True}))

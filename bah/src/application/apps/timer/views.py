@@ -1,3 +1,4 @@
+from concurrent.futures import ThreadPoolExecutor
 import csv
 import time
 import sqlite3
@@ -5,14 +6,14 @@ import psutil
 import boto3
 from datetime import datetime, timezone
 from django.core.paginator import Paginator
-from django.shortcuts import render, redirect
+from botocore.exceptions import NoCredentialsError
+from django.shortcuts import render, redirect, HttpResponse
 from django.conf import settings
 from .models import Upload
-from .forms import UploadFileForm
+from .forms import UploadFileForm, UploadMultiFileForm
 from pymongo import MongoClient
 
 from django.contrib.auth.decorators import login_required
-
 
 
 # Home page index view function
@@ -70,6 +71,47 @@ def upload_file(request):
     return render(request, 'upload.html', {'form': form})
 
 
+#Handles multiple file upload
+@login_required(login_url='login')
+def upload_multiple_files(request):
+    if request.method == 'POST':
+        form = UploadMultiFileForm(request.POST, request.FILES)
+        files = request.FILES.getlist('files')
+        s3 = boto3.client('s3',aws_access_key_id=settings.PUBLIC_KEY, aws_secret_access_key=settings.PRIVATE_KEY)
+        bucket_name = 'bahbucket'
+
+        try:
+            uploaded_files = []
+            futures = []
+
+            with ThreadPoolExecutor(max_workers=3) as executor:
+                for file in files:
+                    key = 'uploads/' + file.name  # Key under which the file will be stored in the bucket
+
+                    future = executor.submit(
+                        s3.upload_file,
+                        file.temporary_file_path(),
+                        bucket_name,
+                        key
+                    )
+                    futures.append(future)
+
+                # Wait for all futures to complete
+                for future in futures:
+                    future.result()
+
+                    # Generate the file URL using Transfer Acceleration
+                    file_url = f"https://{bucket_name}.s3-accelerate.amazonaws.com/{key}"
+                    uploaded_files.append({'name': file.name, 'url': file_url})
+
+            return HttpResponse('Files were uploaded successfully')
+        except NoCredentialsError:
+            return HttpResponse('AWS credentials not found. Please configure AWS CLI.')
+    else:
+        form = UploadMultiFileForm()    
+    return render(request, 'multi_upload.html', {'form': form})
+
+
 # View function to display file stats table
 @login_required(login_url='login')
 def file_list(request):
@@ -77,12 +119,11 @@ def file_list(request):
     return render(request, 'file_list.html', {'files': files})
 
 
+# View function to display contents of specific file in pages
 def csv_table_view(request):
     # Connect to the SQLite database
     connection = sqlite3.connect('../../data/SportsDB.db')
     cursor = connection.cursor()
-
-    # Specify the table name
     table_name = 'sports'
 
     # Fetch the column names from the SQLite table
@@ -92,7 +133,6 @@ def csv_table_view(request):
 
     # Get the current page number from the request's GET parameters
     page_number = request.GET.get('page')
-
     # Set the number of rows to display per page
     rows_per_page = 10
     
@@ -130,7 +170,6 @@ def handle_file_to_directory(f):
             destination.write(chunk)
     return header
 
-
 #Helper function to stream file into mongodb
 def handle_file_to_mongo(f):
     client = MongoClient(settings.MONGODB_HOST, settings.MONGODB_PORT)
@@ -154,7 +193,6 @@ def handle_file_to_mongo(f):
         collection.insert_many(documents)
     client.close()
     return header
-
 
 #Helper function to stream file into sqlite
 def handle_file_to_sql(f):
@@ -186,7 +224,7 @@ def handle_file_to_sql(f):
     connection.close()
     return header
 
-
+#Helper function to stream file into s3
 def handle_file_to_s3(f):
     print(type(f))
 
