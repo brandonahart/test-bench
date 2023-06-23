@@ -4,7 +4,7 @@ import sqlite3
 import psutil
 import boto3
 from datetime import datetime, timezone
-from django.http import HttpResponse
+from django.core.paginator import Paginator
 from django.shortcuts import render, redirect
 from django.conf import settings
 from .models import Upload
@@ -75,6 +75,50 @@ def upload_file(request):
 def file_list(request):
     files = Upload.objects.all()
     return render(request, 'file_list.html', {'files': files})
+
+
+def csv_table_view(request):
+    # Connect to the SQLite database
+    connection = sqlite3.connect('../../data/SportsDB.db')
+    cursor = connection.cursor()
+
+    # Specify the table name
+    table_name = 'sports'
+
+    # Fetch the column names from the SQLite table
+    cursor.execute(f"SELECT * FROM {table_name} LIMIT 1")
+    columns = [column[0] for column in cursor.description]
+    print(columns)
+
+    # Get the current page number from the request's GET parameters
+    page_number = request.GET.get('page')
+
+    # Set the number of rows to display per page
+    rows_per_page = 10
+    
+    if page_number:
+        index = (int(page_number) - 1) * rows_per_page
+        # Fetch only the 10 rows for the current page
+        cursor.execute(f"SELECT * FROM {table_name} LIMIT {rows_per_page}, OFFSET {index}")
+    else:
+        # Fetch the first 10 rows for the initial page
+        cursor.execute(f"SELECT * FROM {table_name} LIMIT {rows_per_page}")
+
+    # Fetch the rows from the cursor
+    rows = cursor.fetchall()
+
+    # Close the database connection
+    connection.close()
+
+    # Create a Paginator object with the rows and the desired number of rows per page
+    paginator = Paginator(rows, rows_per_page)
+
+    # Get the Page object for the current page number
+    page = paginator.get_page(page_number)
+    print(page,page.has_next,page.has_previous)
+
+    # Pass the page object to the template for rendering
+    return render(request, 'preview.html', {'page': page, 'columns': columns})
 
 
 # Helper view function to handle regular file upload to specific loaction
