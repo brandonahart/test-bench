@@ -120,6 +120,7 @@ def file_list(request):
 
 
 # View function to display contents of specific file in pages
+@login_required(login_url='login')
 def csv_table_view(request):
     # Connect to the SQLite database
     connection = sqlite3.connect('../../data/SportsDB.db')
@@ -134,24 +135,26 @@ def csv_table_view(request):
     # Get the current page number from the request's GET parameters
     page_number = request.GET.get('page')
     # Set the number of rows to display per page
-    rows_per_page = 10
+    rows_per_page = 1000
     
-    if page_number:
-        index = (int(page_number) - 1) * rows_per_page
+    '''if page_number:
+        index = int((int(page_number)) / 100) * 1000
         # Fetch only the 10 rows for the current page
-        cursor.execute(f"SELECT * FROM {table_name} LIMIT {rows_per_page}, OFFSET {index}")
+        print("test")
+        cursor.execute(f"SELECT * FROM {table_name} LIMIT {rows_per_page} OFFSET {index}")
     else:
         # Fetch the first 10 rows for the initial page
         cursor.execute(f"SELECT * FROM {table_name} LIMIT {rows_per_page}")
-
+    '''
     # Fetch the rows from the cursor
+    cursor.execute("SELECT * FROM sports limit 1000")
     rows = cursor.fetchall()
 
     # Close the database connection
     connection.close()
 
     # Create a Paginator object with the rows and the desired number of rows per page
-    paginator = Paginator(rows, rows_per_page)
+    paginator = Paginator(rows, 10)
 
     # Get the Page object for the current page number
     page = paginator.get_page(page_number)

@@ -40,7 +40,7 @@ def loginPage(request):
 
         if user is not None:
             login(request, user)
-            return redirect('/timer/upload/')
+            return redirect('/timer/')
         else:
             messages.info(request, 'Username or password is incorrect')        
     
