@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import status, generics
 from rest_framework import filters
-from .serializers import DataFileSerializer, ProjectSerializer
+from .serializers import DataFilDetailSerializer, DataFileSerializer, ProjectSerializer
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -19,42 +19,7 @@ def api_root(request, format=None):
         'datafiles': reverse('datafile-list', request=request, format=format)
     })
 
-'''
-class DataFileAPIView(APIView):
-    queryset = DataFile.objects.all()
-    parser_classes = (MultiPartParser, FormParser)
-    serializer_class = DataFileSerializer
-    
-    def post(self, request):
-        serializer = self.serializer_class(data=request.data)
-
-        if serializer.is_valid():
-            uploaded_file = serializer.validated_data["file"]
-            #function to write file somewhere
-
-            serializer.save()
-            print('DEBUG:',str(serializer.data))
-            return Response(
-                serializer.data,
-                status=status.HTTP_201_CREATED
-            )
-        
-        return Response(
-            serializer.errors,
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    
-    def get(self, request, format=None):
-        """
-        Return a list of all users.
-        """
-        
-        datafiles = [datafile.file_name for datafile in DataFile.objects.all()]
-        return Response(datafiles)
- '''  
 class DataFileAPIView(generics.ListCreateAPIView):
-    #search_fields = ['=project_fk__project_id','=year_quarter']
-    #filter_backends = (filters.SearchFilter,)
     queryset = DataFile.objects.all()
     parser_classes = (MultiPartParser, FormParser)
     serializer_class = DataFileSerializer
@@ -76,10 +41,9 @@ class DataFileAPIView(generics.ListCreateAPIView):
 
 class DataFileDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = DataFile.objects.all()
-    serializer_class = DataFileSerializer
+    serializer_class = DataFilDetailSerializer
 
 
-#these two functions can be combined into a single function using viewsets instead of generics
 class ProjectList(generics.ListCreateAPIView):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
