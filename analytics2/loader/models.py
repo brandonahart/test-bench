@@ -1,5 +1,10 @@
 from django.db import models
 from django.utils import timezone
+from django.conf import settings
+
+
+def content_file_name(instance, file_name):
+    return '/'.join([instance.project_fk.customer_name, instance.year_quarter, file_name])
 
 
 class Project(models.Model):
@@ -20,7 +25,7 @@ class DataFile(models.Model):
         ('valid', 'VALID')
     )
 
-    file = models.FileField(upload_to='./static')
+    file = models.FileField(upload_to=content_file_name)
     file_name = models.CharField(max_length=50, null=True, blank=True)
     file_type = models.CharField(max_length=50, null=True, blank=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICE)

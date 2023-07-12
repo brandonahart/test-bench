@@ -30,11 +30,11 @@ class DataFileAPIView(generics.ListCreateAPIView):
         period = self.request.query_params.get('period')
 
         if project and period:
-            queryset = queryset.filter(project_fk=project,year_quarter=period)
+            queryset = queryset.filter(project_fk=project,year_quarter__contains=period)
         elif project:
             queryset = queryset.filter(project_fk=project)
         elif period:
-            queryset = queryset.filter(year_quarter=period)
+            queryset = queryset.filter(year_quarter__contains=period)
 
         return queryset
 
