@@ -6,8 +6,6 @@ The legacy system uses all of the above technologies. The next generation develo
 
 Objectives: better understand legacy system & dependencies. Move to updated versions. Containerize to increase availability of test environments, lower the cost of running the environment, while meeting data security requirements.
 
-
-
 ## Individual Tests and Protypes 
 
 * Test1 -- Prerequisite python, learning and teaching. Subprocesses as used in legacy architecture were a focus of this phase.  
@@ -17,8 +15,17 @@ Objectives: better understand legacy system & dependencies. Move to updated vers
 
 ## Verifying Django
 
-The legacy system relies on Django. Is this still the best choice today for the next architecture (or, for example, would switching to Flask be justified?)
+The legacy system relies on Django. Is this still the best choice today for the updated architecture (or, for example, would switching to Flask be justified)?
+
 * Application -- Validate the choice of sticking with Django
 
-## New Development Environment
+# Development Environment
+
 Create new development development DjangoRestFramework.
+
+*
+*
+*
+*
+
+
