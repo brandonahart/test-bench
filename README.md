@@ -1,8 +1,7 @@
 # Test Harness
 
-A configuration for testing the combination of gunicorn WSGI, django, celery, RDBMS and mongodb
+The test harness provides code necessary to learn, test, and analyze the combination of Gunicorn WSGI, Python Django, RDBMS/Sqlite3, Celery, MongoDB, an R-base modeling environment, and Docker-base containers
 
 * bah -- Brandon's miscellany 
-* joek -- JoeK's miscellany
 
 
