@@ -8,7 +8,8 @@ def content_file_name(instance, file_name):
 
 
 class Project(models.Model):
-    customer_name = models.CharField(max_length=50, null=True, blank=True)
+    owner = models.ForeignKey('auth.User', related_name='projects', on_delete=models.CASCADE, null=True)
+    customer_name = models.CharField(max_length=50, null=True, blank=True) #Company_name
     project_id = models.CharField(max_length=50, null=True, blank=True, unique=True)
     #initial mapping field
 

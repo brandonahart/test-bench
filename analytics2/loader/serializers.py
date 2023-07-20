@@ -4,11 +4,15 @@ from .models import DataFile, Project
 
 
 class DataFileSerializer(serializers.HyperlinkedModelSerializer):
-    #file = serializers.FileField(write_only=True)
-
     file_name = serializers.CharField(read_only=True)
     file_type = serializers.CharField(read_only=True)
     size = serializers.CharField(read_only=True)
+    project_fk = serializers.PrimaryKeyRelatedField(queryset=Project.objects.none())
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        user = self.context['request'].user
+        self.fields['project_fk'].queryset = Project.objects.filter(owner__groups__in=user.groups.all())
 
     class Meta:
         model = DataFile
@@ -31,7 +35,7 @@ class DataFileSerializer(serializers.HyperlinkedModelSerializer):
         return datafile
     
 
-class DataFilDetailSerializer(serializers.HyperlinkedModelSerializer):
+class DataFileDetailSerializer(serializers.HyperlinkedModelSerializer):
     file_name = serializers.CharField(read_only=True)
     file_type = serializers.CharField(read_only=True)
     size = serializers.CharField(read_only=True)
@@ -43,8 +47,9 @@ class DataFilDetailSerializer(serializers.HyperlinkedModelSerializer):
  
 
 class ProjectSerializer(serializers.HyperlinkedModelSerializer):
+    owner = serializers.ReadOnlyField(source='owner.username')
     datafiles = serializers.HyperlinkedRelatedField(many=True, view_name='datafile-detail', read_only=True)
 
     class Meta:
         model = Project
-        fields = ('url', 'id', 'customer_name', 'project_id', 'datafiles')
+        fields = ('url', 'id', 'customer_name', 'project_id', 'datafiles', 'owner')

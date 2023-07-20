@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'loader'
+    'loader',
+    'rest_framework.authtoken'
 ]
 
 MIDDLEWARE = [
@@ -101,6 +102,14 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',  # <-- And here
+        'rest_framework.authentication.SessionAuthentication',
+
+    ],
+}
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
@@ -120,7 +129,7 @@ USE_TZ = True
 STATIC_ROOT = '/Users/brandonhart/Documents/static'
 STATIC_URL = '/static/'
 MEDIA_ROOT = '/Users/brandonhart/Documents/media'
-MEADIA_URL = '/media/'
+MEDIA_URL = '/media/'
 
 
 # Default primary key field type
