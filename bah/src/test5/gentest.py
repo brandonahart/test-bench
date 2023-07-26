@@ -14,6 +14,8 @@ def run_gendf(n, size):
     robjects.r('aframe <- gendf({}, {})'.format(n, size))
     elapsed_time = time.time() - start_time
 
+    size = robjects.r("obj_size(aframe)")
+    print("aframe size in R:", size)
     robjects.r('aframe <- NULL')
     robjects.r('gc()')
 
@@ -32,7 +34,7 @@ for i in range(1,20):
     memory_usage = psutil.Process().memory_info().rss
 
     x_arr.append(i)
-    print(f"Number of columns: {n*i}")
+    print(f"Number of rows: {n*i}")
 
     elapsed_time = run_gendf(n*i, size)
     y_arr.append(elapsed_time)
@@ -42,6 +44,6 @@ for i in range(1,20):
     print(f"Memory Consumed: {memory_consumed}\n")
 
 
-
+#Scatter plot
 fig = px.scatter(x=x_arr, y=y_arr)
 fig.show()

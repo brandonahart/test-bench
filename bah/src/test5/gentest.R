@@ -1,3 +1,4 @@
+library(lobstr)
 
 ### generate a matrix with rowcnt, colcnt
 genmat <- function(rowcnt=1000, colcnt=10) {
