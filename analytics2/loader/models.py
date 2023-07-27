@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
+from django.contrib.auth.models import User
 
 
 def content_file_name(instance, file_name):
@@ -10,6 +11,8 @@ def content_file_name(instance, file_name):
 class Project(models.Model):
     customer_name = models.CharField(max_length=50, null=True, blank=True)
     project_id = models.CharField(max_length=50, null=True, blank=True, unique=True)
+    admin = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owned_projects', null=True, blank=True)
+    members = models.ManyToManyField(User, related_name='projects', null=True, blank=True)
     #initial mapping field
 
     def __str__(self):
