@@ -12,6 +12,7 @@ Objectives: better understand legacy system & dependencies. Move to updated vers
 * Test2 -- (1) Python multiprocess, including processes and threads, (2) Sqlite3 as the key to a more flexible, performant dev environment  
 * Test3 -- Mongo and relevant testing -- via pymongo. (Legacy system uses mostly R for mongo). Compares mongo loading & query performance to SQLite, including effects of block sizes (chunks), indexes, concurent clients and other variables.
 * Test4 -- AWS S3 development, including multipart python/boto3 with and without threading.
+* Test5 -- Rpy2 testing, including plotly to display results and Docker to containerize Python and R scripts.
 
 ## Verifying Django
 
