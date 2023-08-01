@@ -34,7 +34,7 @@ Create new development environment on DjangoRestFramework.
 
 * Docker Image for Development:
 
-    ![Development Image  ><](./doc/img/docker-dev.png)
+    ![Development Image](./doc/img/docker-dev.png)
 
 *
 *
