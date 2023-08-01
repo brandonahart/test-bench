@@ -32,7 +32,9 @@ Summary of Key Benefits of sticking with Django + DjangoRestFramework
 
 Create new development environment on DjangoRestFramework.
 
-*
+* Docker Image for Development:
+    ![plot](./doc/img/docker-dev.png)
+
 *
 *
 *
