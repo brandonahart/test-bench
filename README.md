@@ -47,6 +47,10 @@ Create new development environment on DjangoRestFramework.
     ![Project-File Metadata](./doc/img/proj-file-erd.png)
 
 * [branch project-to-user] configure Django security model, ORM-based filtering
+
+
+    ![Django Security Model](./doc/img/django-security-erd.png)
+
 *
 
 
