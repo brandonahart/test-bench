@@ -24,6 +24,11 @@ Application -- Validate the choice of sticking with Django
   * Sqlite3 & Django
   * Celery in Django
   * gunicorn
+  * Testing file upload behavior
+      * Comparing S3 vs filesystem vs Mongo vs SQlite
+      * Django temp files vs memory files
+      * Writing files via python chunks (blocks)
+     
 
 Summary of Key Benefits of sticking with Django + DjangoRestFramework
     
@@ -36,8 +41,12 @@ Create new development environment on DjangoRestFramework.
 
     ![Development Image](./doc/img/docker-dev.png)
 
-*
-*
+* Configure for easy use by Angular development team
+* Data Model for file Metadata
+
+    ![Project-File Metadata](./doc/img/proj-file-erd.png)
+
+* [branch project-to-user] configure Django security model, ORM-based filtering
 *
 
 
